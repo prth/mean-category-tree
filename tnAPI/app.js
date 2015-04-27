@@ -12,7 +12,7 @@ var users = require('./routes/users');
 
 //database initialization
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/meanCategoryTreeDB');
+mongoose.connect('mongodb://localhost/meanTreeDB2');
 
 
 var categorySchema = new mongoose.Schema({
