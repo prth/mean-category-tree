@@ -24,7 +24,7 @@ Note: Code cleanup is pending
 
 
 <br /><br />
-Screeshots:
+Screenshots:
 <br />
 ![Screenshot 1](https://github.com/prth/mean-category-tree/blob/master/screenshots/screenshot1.jpg "Screenshot 1")
 <br />
