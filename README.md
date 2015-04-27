@@ -15,6 +15,12 @@ WebApp pages:
 - tree.html - View entire tree structure
 
 
+<br /><br />
+Command to start server in debug mode: 
+sudo DEBUG=tnAPI:server npm start
 
 <br /><br />
 Note: Code cleanup is pending
+
+
+
