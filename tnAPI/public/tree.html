@@ -1,0 +1,52 @@
+<!doctype html>
+<html ng-app="category">
+  <head>
+      <!-- Latest compiled and minified CSS -->
+      <link rel="stylesheet" href="css/bootstrap.min.css">
+
+      <!-- Optional theme -->
+      <link rel="stylesheet" href="css/bootstrap-theme.min.css">
+    
+      <style>
+        ul {
+            padding-top: 10px;
+        }
+       
+        li  {
+            padding: 10px;
+        }
+      </style>
+      
+      
+  </head>
+  <body ng-controller="CategoryController" data-ng-init="init()">
+    <div class="container">
+      <div class="page-header">
+        <h1>Category Tree</h1><a href="/">Edit tree</a>
+      </div>
+        
+        <br /><br />
+    <script type="text/ng-template"  id="tree_item_renderer.html">
+    <div class='category' ng-hide='data.editCat || !data.isValid'>
+    <button ng-click="collapse(data)" ng-show="(data.nodes.length > 0)&&(data.expandNode)" class='btn btn-xs'><span class='glyphicon glyphicon-chevron-up'></span></button>
+    <button ng-click="expand(data)" ng-show="(data.nodes.length > 0)&&(!data.expandNode)" class='btn btn-xs'><span class='glyphicon glyphicon-chevron-down'></span></button>
+    <a ng-show='data.categorySlug' href="/category.html#{{data.categorySlug}}">{{data.name}}</a>
+    <span ng-show='!data.categorySlug'>{{data.name}}</span></div>
+    <ul ng-show='data.expandNode'><li ng-repeat="data in data.nodes" ng-include="'tree_item_renderer.html'"></li></ul>
+</script>
+        
+        <ul ng-app="Application">
+            <li ng-repeat="data in itemList" ng-include="'tree_item_renderer.html'"></li>
+        </ul>
+     
+
+    <script src="js/angular.min.js"></script>
+        
+    <script src="js/angular-resource.min.js"></script>
+    <script src="js/angular-route.min.js"></script>
+        
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.7/angular-resource.min.js"></script>
+    <script src="controllers/categoryContoller.js"></script>
+        
+  </body>
+</html>

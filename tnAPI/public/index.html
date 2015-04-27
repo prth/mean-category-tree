@@ -1,0 +1,104 @@
+<!doctype html>
+<html ng-app="category">
+  <head>
+      <!-- Latest compiled and minified CSS -->
+      <link rel="stylesheet" href="css/bootstrap.min.css">
+
+      <!-- Optional theme -->
+      <link rel="stylesheet" href="css/bootstrap-theme.min.css">
+    
+      <style>
+        ul {
+            padding-top: 10px;
+        }
+       
+        li  {
+            padding: 10px;
+        }
+          
+          .expandedNodeMargin {
+              margin-left: 28px;
+          }
+      </style>
+      
+      
+  </head>
+  <body ng-controller="CategoryController" data-ng-init="init()">
+    <div class="container">
+      <div class="page-header">
+        <h1>Category Tree</h1><a href="/tree.html">View tree</a>
+      </div>
+       <form class="form-inline" ng-submit="addCategory()" ng-controller="CategoryController">
+          <div class="form-group">
+            <input type="text" class="form-control" ng-model="category.categoryName" placeholder="Enter category name">
+          </div>
+           <div class="form-group" ng-show="categoryList.length">
+            <select class="form-control" ng-model="category.parentCategory">
+              <option value="0" ng-selected="true">Select a parent category (optional)</option>
+              <option ng-repeat="data in categoryList" value="{{data._id}}">{{data.categoryName}}</option>
+            </select>
+           </div>
+          <button type="submit" class="btn btn-primary">Add category</button>
+        </form>
+        
+        
+        <br /><br />
+
+        
+        <script type="text/ng-template"  id="tree_item_renderer.html">
+    <div class='category' ng-hide='data.editCat || !data.isValid'>
+    <button ng-click="collapse(data)" ng-show="(data.nodes.length > 0)&&(data.expandNode)" class='btn btn-xs'><span class='glyphicon glyphicon-chevron-up'></span></button>
+    <button ng-click="expand(data)" ng-show="(data.nodes.length > 0)&&(!data.expandNode)" class='btn btn-xs'><span class='glyphicon glyphicon-chevron-down'></span></button>
+    {{data.name}}</div>
+    <div class='category-add' ng-show='!data.isValid'>
+        <form class="form-inline" ng-submit="saveChildCategory()" ng-controller="CategoryController">
+            <form>
+            <div class="form-group">
+                <input type="text" class="form-control" ng-model="addCategory.categoryName">
+                <input type="text" class="form-control" ng-model="addCategory.parentCategory" ng-init="addCategory.parentCategory=data.parentCategory" readonly="readonly" ng-hide="!data.isValid"> {{data.name}}
+                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="button" class="btn btn-primary" ng-click="cancelAddChildNode(data)">Cancel</button>
+            </div>
+        </form>
+    </div>
+    <div class='category-edit' ng-show='data.editCat'>
+        <form class="form-inline" ng-submit="editCategory(data)" ng-controller="CategoryController">
+          <div class="form-group">
+            <input type="text" class="form-control" ng-model="editCategoryModel.categoryName" ng-init="editCategoryModel.categoryName=data.name">
+          </div>
+           <div class="form-group" ng-show="categoryList.length">
+            <select class="form-control"  ng-model="editCategoryModel.parentCategory" ng-init="editCategoryModel.parentCategory=data.parentCategory">
+              <option ng-if="data.parentCategory == 0" value="0" ng-selected="true">Select a parent category (optional)</option>
+              <option ng-if="data.parentCategory != 0" value="0">Select a parent category (optional)</option>
+              <option ng-repeat="data2 in categoryList | filter: { _id: data.parentCategory }:false" value="{{data2._id}}" ng-selected="true">{{data2.categoryName}}</option>
+              <option ng-repeat="data2 in categoryList | filter: { _id: '!'+data.parentCategory }" value="{{data2._id}}">{{data2.categoryName}}</option>
+            </select>
+           </div>
+          <button type="submit" class="btn btn-primary">Save</button>
+          <button type="button" class="btn btn-primary" ng-click="cancelEditNode(data)">Cancel</button>
+        </form>
+    </div>
+    <div ng-class="{expandedNodeMargin: data.nodes.length > 0}">
+    <!--
+    <button class="btn btn-default btn-xs" ng-click="openAddChildNode(data)"><span class="glyphicon glyphicon-plus"></span></button>-->
+    <button class="btn btn-default btn-xs" ng-click="openEditNode(data)"><span class="glyphicon glyphicon-edit"></span></button>
+    <button class="btn btn-danger btn-xs" ng-click="deleteNode(data)"><span class="glyphicon glyphicon glyphicon-remove"></span></button>
+    </div>
+    <ul ng-show='data.expandNode'><li ng-repeat="data in data.nodes" ng-include="'tree_item_renderer.html'"></li></ul>
+</script>
+        
+        <ul ng-app="Application">
+            <li ng-repeat="data in itemList" ng-include="'tree_item_renderer.html'"></li>
+        </ul>
+     
+
+    <script src="js/angular.min.js"></script>
+
+    <script src="js/angular-resource.min.js"></script>
+    <script src="js/angular-route.min.js"></script>
+        
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.7/angular-resource.min.js"></script>
+    <script src="controllers/categoryContoller.js"></script>
+        
+  </body>
+</html>
