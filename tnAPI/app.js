@@ -27,7 +27,7 @@ var categorySchema = new mongoose.Schema({
     parentCategory: String
 });
 
-//Added monguurl to create URL slug
+//Added monguurl to create URL slug - for example: "Mo
 categorySchema.plugin(monguurl({
     source: 'categoryName',
     target: 'categorySlug'

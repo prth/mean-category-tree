@@ -22,7 +22,7 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
                     $scope.categoryList = data;
                     categoryListObj = data;
                     //$scope.generateJSON();
-                    $scope.processTree("0");
+                    $scope.processTree("0", 0);
                     if ($scope.$$phase !== '$digest') {
                         $scope.$digest()
                     }
@@ -120,8 +120,7 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
         };
 
 
-
-        $scope.processTree = function (parentId) {
+        $scope.processTree = function (parentId, categoryLevel) {
             console.log('searching for parent ' + parentId);
             //for (x=0; x < categoryListObj.length; x++) {
             //    console.log("hey");
@@ -130,8 +129,8 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
             var d = $scope.categoryList.filter(function (cat) {
                 return cat.parentCategory == parentId
             });
-
             for (var c = 0; c < d.length; c++) {
+                d[c].categoryNodeLevel = categoryLevel;
                 console.log(d[c]);
                 if (parentId == 0) {
                     console.log('adding root ' + d[c].categoryName)
@@ -143,6 +142,7 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
                         editCat: false,
                         expandNode: true,
                         isValid: true,
+                        categoryNodeLevel: categoryLevel,
                         nodes: []
                     });
                 } else {
@@ -156,6 +156,7 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
                             editCat: false,
                             expandNode: true,
                             isValid: true,
+                            categoryNodeLevel: categoryLevel,
                             nodes: []
                         });
                         console.log('adding parent not found ' + d[c].categoryName)
@@ -168,6 +169,7 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
                             expandNode: true,
                             editCat: false,
                             isValid: true,
+                            categoryNodeLevel: categoryLevel,
                             nodes: []
                         });
                         console.log('adding parent found' + d[c].categoryName)
@@ -180,7 +182,7 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
                 if ($scope.categoryCovered.indexOf(d[c].categoryName) == -1) {
                     console.log('hey');
                     $scope.categoryCovered.push(d[c].categoryName);
-                    $scope.processTree(d[c]._id);
+                    $scope.processTree(d[c]._id, categoryLevel + 1);
 
                 }
                 //}
@@ -348,6 +350,10 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
         $scope.expand = function (data) {
             data.expandNode = true;
         }
+
+        $scope.categoryNodeLevelFilter = function (categoryNodeLevel1, categoryNodeLevel2) {
+            return categoryNodeLevel1 < categoryNodeLevel2;
+        };
 
 }])
     .config(function ($routeProvider, $locationProvider) {
