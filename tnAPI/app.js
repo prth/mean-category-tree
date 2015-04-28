@@ -71,7 +71,8 @@ app.get('/categories/:categorySlug', function (req, res) {
         if (!err) {
             return res.send(category);
         } else {
-            return console.log(err);
+            console.log(err);
+			return err;
         }
     });
 });
@@ -171,7 +172,7 @@ app.delete('/categories/:id', function (req, res) {
                     });
                 }
             } else {
-                return console.log(err);
+                console.log(err);
             }
         });
 
