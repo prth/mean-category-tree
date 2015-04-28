@@ -20,15 +20,15 @@
 
         <script type="text/ng-template" id="tree_item_renderer">
             <div class='category' ng-hide='data.editCat || !data.isValid'>
-                <button ng-click="collapse(data)" ng-show="(data.nodes.length > 0)&&(data.expandNode)" class='btn btn-xs'><span class='glyphicon glyphicon-chevron-up'></span>
+                <button ng-click="collapse(data)" ng-show="(data.nodes.length > 1)&&(data.expandNode)" class='btn btn-xs'><span class='glyphicon glyphicon-chevron-up'></span>
                 </button>
-                <button ng-click="expand(data)" ng-show="(data.nodes.length > 0)&&(!data.expandNode)" class='btn btn-xs'><span class='glyphicon glyphicon-chevron-down'></span>
+                <button ng-click="expand(data)" ng-show="(data.nodes.length > 1)&&(!data.expandNode)" class='btn btn-xs'><span class='glyphicon glyphicon-chevron-down'></span>
                 </button>
                 <a ng-show='data.categorySlug' href="/category.html#{{data.categorySlug}}">{{data.name}}</a>
                 <span ng-show='!data.categorySlug'>{{data.name}}</span>
             </div>
             <ul ng-show='data.expandNode'>
-                <li ng-repeat="data in data.nodes" ng-include="'tree_item_renderer'"></li>
+                <li ng-repeat="data in data.nodes" ng-include="'tree_item_renderer'" ng-show="data.isValid"></li>
             </ul>
         </script>
 

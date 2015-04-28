@@ -92,6 +92,7 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
             $scope.categoryCovered = [];
             $scope.tree = {};
             $scope.lastEditOpenedNode = null;
+            $scope.lastAddOpenedNode = null;
             $scope.getCategories();
         };
 
@@ -213,12 +214,19 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
             //  data.nodes.push({ name: '', parentCategory: data.name,  editCat: false, isValid: false, nodes: []});
             //  console.log(data.nodes.length);
             //  console.log(JSON.stringify($scope.itemList, null, 2));
+
+            if($scope.lastAddOpenedNode != null && $scope.lastAddOpenedNode.showAdd)
+            {
+                $scope.lastAddOpenedNode.showAdd = false;
+                $scope.lastAddOpenedNode = null;
+            }
             var addNode = data.nodes.filter(function (cat) {
                 return !cat.isValid;
             });
 
             if(addNode.length == 1) {
                 addNode[0].showAdd = true;
+                $scope.lastAddOpenedNode = addNode[0];
             }
         }
 
@@ -226,6 +234,8 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
         $scope.cancelAddChildNode = function (data) {
             //console.log($scope.itemList);
             data.showAdd = false;
+            $scope.lastAddOpenedNode.showAdd = false;
+            $scope.lastAddOpenedNode = null;
             /*
             if (data.parentCategory == 0) {
                 var index = $scope.findIndexByKeyValue($scope.itemList, 'name', data.name);
@@ -308,10 +318,8 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
         //filter on the basis of category node level
         $scope.categoryNodeLevelFilter = function (categoryNode1) {
             return function(categoryNode2) {
-                //return true;
-                //console.log('PRTH -' + categoryNode1.categoryNodeLevel + ' < ' + categoryNode2.categoryNodeLevel)
-                if(categoryNode1.categoryNodeLevel > categoryNode2.categoryNodeLevel)
-                    return true;
+                return categoryNode1.isValid == true && categoryNode1.categoryNodeLevel > categoryNode2.categoryNodeLevel
+                  && categoryNode1.parentCategory != categoryNode2._id;
             }
         };
 
