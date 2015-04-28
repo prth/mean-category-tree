@@ -63,6 +63,8 @@
                             <option ng-if="data.parentCategory == 0" value="0" ng-selected="true">Select a parent category (optional)</option>
                             <option ng-if="data.parentCategory != 0" value="0">Select a parent category (optional)</option>
                             <option ng-repeat="data2 in categoryList | filter:{ '_id': data.parentCategory }:true" value="{{data2._id}}" ng-selected="true">{{data2.categoryName}}</option>
+
+                            //need a filter to remove child categories
                             <option ng-repeat="data2 in categoryList | filter:{ '_id': '!'+data.parentCategory }:true" value="{{data2._id}}">{{data2.categoryName}}</option>
                         </select>
                     </div>
