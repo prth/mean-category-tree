@@ -70,10 +70,7 @@ app.get('/categories/:categorySlug', function (req, res) {
     }, function (err, category) {
         if (!err) {
             return res.send(category);
-        } else {
-            console.log(err);
-			return err;
-        }
+        } 
     });
 });
 
@@ -124,8 +121,7 @@ app.post('/categories', function(req, res){
 
 app.post('/categories', function (req, res) {
     var category;
-    console.log("POST: ");
-    console.log(req.body);
+    
     category = new Category({
         categoryName: req.body.categoryName,
         categoryCount: req.body.categoryCount,
@@ -133,21 +129,12 @@ app.post('/categories', function (req, res) {
     });
     if (category.parentCategory == null)
         category.parentCategory = 0;
-    //console.log('find slug');
-    //create_url_slug(category.categoryName, function(result){
-    //if(category.categorySlug != null)
-    //{
-    //  category.categorySlug = result;
+    
     category.save(function (err) {
         if (!err) {
-            //return
             console.log("created");
             return res.send(category);
-        } else {
-            console.log("error");
-            return err;
-            //return console.log(err);
-        }
+        } 
     });
 
     //});;
@@ -171,9 +158,7 @@ app.delete('/categories/:id', function (req, res) {
                         }
                     });
                 }
-            } else {
-                console.log(err);
-            }
+            } 
         });
 
 
@@ -182,9 +167,7 @@ app.delete('/categories/:id', function (req, res) {
 
                 console.log("removed");
                 return res.send('');
-            } else {
-                console.log(err);
-            }
+            } 
         });
     });
 });
@@ -199,10 +182,8 @@ app.put('/categories/:id', function (req, res) {
         return category.save(function (err) {
             if (!err) {
                 console.log("updated");
-            } else {
-                console.log(err);
-            }
-            return res.send(category);
+				return res.send(category);
+            } 
         });
     });
 });
