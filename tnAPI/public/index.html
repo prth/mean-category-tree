@@ -41,13 +41,14 @@
                 </button>
                 <button ng-click="expand(data)" ng-show="(data.nodes.length > 0)&&(!data.expandNode)" class='btn btn-xs'><span class='glyphicon glyphicon-chevron-down'></span>
                 </button>
-                {{data.name}}</div>
-            <div class='category-add' ng-show='!data.isValid'>
-                <form class="form-inline" ng-submit="saveChildCategory()" ng-controller="CategoryController">
-                    <form>
+                {{data.name}}
+            </div>
+
+            <div class='category-add' ng-show='data.showAdd'>
+                <form class="form-inline" ng-submit="saveChildCategory()" ng-controller="CategoryController" ng-show='data.showAdd'>
                         <div class="form-group">
                             <input type="text" class="form-control" ng-model="addCategory.categoryName">
-                            <input type="text" class="form-control" ng-model="addCategory.parentCategory" ng-init="addCategory.parentCategory=data.parentCategory" readonly="readonly" ng-hide="!data.isValid"> {{data.name}}
+                            <input type="text" class="form-control" ng-model="addCategory.parentCategory" ng-init="addCategory.parentCategory=data.parentCategory" readonly="readonly" ng-show="data.isValid"> {{data.name}}
                             <button type="submit" class="btn btn-primary">Save</button>
                             <button type="button" class="btn btn-primary" ng-click="cancelAddChildNode(data)">Cancel</button>
                         </div>
@@ -65,23 +66,23 @@
                             <option ng-repeat="data2 in categoryList | filter:{ '_id': data.parentCategory }:true" value="{{data2._id}}" ng-selected="true">{{data2.categoryName}}</option>
 
                             //need a filter to remove child categories
-                            <option ng-repeat="data2 in categoryList | filter:{ '_id': '!'+data.parentCategory }:true" value="{{data2._id}}">{{data2.categoryName}}</option>
+                            <option ng-repeat="data2 in categoryList | filter: categoryNodeLevelFilter(data)" value="{{data2._id}}">{{data2.categoryName}}</option>
                         </select>
                     </div>
                     <button type="submit" class="btn btn-primary">Save</button>
                     <button type="button" class="btn btn-primary" ng-click="cancelEditNode(data)">Cancel</button>
                 </form>
             </div>
-            <div ng-class="{expandedNodeMargin: data.nodes.length > 0}">
-                <!--
-    <button class="btn btn-default btn-xs" ng-click="openAddChildNode(data)"><span class="glyphicon glyphicon-plus"></span></button>-->
+            <div ng-class="{expandedNodeMargin: data.nodes.length > 0}" ng-show="data.isValid">
+
+    <button class="btn btn-default btn-xs" ng-click="openAddChildNode(data)"><span class="glyphicon glyphicon-plus"></span></button>
                 <button class="btn btn-default btn-xs" ng-click="openEditNode(data)"><span class="glyphicon glyphicon-edit"></span>
                 </button>
                 <button class="btn btn-danger btn-xs" ng-click="deleteNode(data)"><span class="glyphicon glyphicon glyphicon-remove"></span>
                 </button>
             </div>
             <ul ng-show='data.expandNode'>
-                <li ng-repeat="data in data.nodes" ng-include="'tree_item_renderer'"></li>
+                <li ng-repeat="data in data.nodes" ng-include="'tree_item_renderer'" ng-show="data.isValid || (!data.isValid && data.showAdd)"></li>
             </ul>
         </script>
 

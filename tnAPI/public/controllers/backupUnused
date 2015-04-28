@@ -121,13 +121,12 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
                         editCat: false,
                         expandNode: true,
                         isValid: true,
-                        showAdd: false,
                         categoryNodeLevel: categoryLevel,
-                        nodes: [{isValid: false, showAdd: false, parentCategory: childCategories[c]._id}]
+                        nodes: []
                     });
                     console.log('adding root ' + childCategories[c].categoryName)
                 } else {
-                    var parent = $scope.getCategoryObject($scope.itemList, childCategories[c].parentCategory);
+                    var parent = $scope.getObject($scope.itemList, childCategories[c].parentCategory);
                     if (parent == null) {
                         $scope.itemList.push({
                             _id: childCategories[c]._id,
@@ -137,9 +136,8 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
                             editCat: false,
                             expandNode: true,
                             isValid: true,
-                            showAdd: false,
                             categoryNodeLevel: categoryLevel,
-                            nodes: [{isValid: false, showAdd: false, parentCategory: childCategories[c]._id}]
+                            nodes: []
                         });
                         console.log('adding parent not found ' + childCategories[c].categoryName)
                     } else {
@@ -151,9 +149,8 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
                             expandNode: true,
                             editCat: false,
                             isValid: true,
-                            showAdd: false,
                             categoryNodeLevel: categoryLevel,
-                            nodes: [{isValid: false, showAdd: false, parentCategory: childCategories[c]._id}]
+                            nodes: []
                         });
                         console.log('adding parent found' + childCategories[c].categoryName)
                     }
@@ -169,69 +166,133 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
             //console.log($scope.itemList);
         }
 
-        //finds and return category object on the basis of categoryId from the provided categoryObject
-        $scope.getCategoryObject = function (categoryObject, categoryId) {
-            var result = null;
-            if (categoryObject instanceof Array) {
-                for (var i = 0; i < categoryObject.length; i++) {
-                    result = $scope.getCategoryObject(categoryObject[i], categoryId);
+        //unused method
+        $scope.addNode = function (categoryName, parentCategory) {
+            //var post = data.nodes.length + 1;
+            //var newName = data.name + '-' + post;
+            if (!(parentCategory === undefined) && parentCategory != null && categoryName != parentCategory && parentCategory != 0) {
+                console.log('checking parent => ' + parentCategory);
+                var parent = $scope.getObject($scope.itemList, parentCategory); //$scope.itemList.filter(function (cat) { return cat.name == parentCategory })[0];
+                if (parent == null)
+                    $scope.itemList.push({
+                        name: categoryName,
+                        nodes: []
+                    });
+                else {
+                    //console.log(parent);
+                    parent.nodes.push({
+                        name: categoryName,
+                        nodes: []
+                    });
                 }
             } else {
-                //console.log('=>' + categoryId)
-                for (var prop in categoryObject) {
-                    //console.log(prop + ': ' + categoryObject[prop]);
-                    if (prop == '_id') {
-                        if (categoryObject[prop] == categoryId) {
-                            return categoryObject;
+                $scope.itemList.push({
+                    name: categoryName,
+                    nodes: []
+                });
+            }
+
+        };
+
+
+        $scope.fillTree = function (name, steps) {
+            var current = null,
+                existing = null,
+                i = 0;
+            for (var y = 0; y < steps.length; y++) {
+                if (y == 0) {
+                    if (!$scope.tree.children || typeof $scope.tree.children == 'undefined') {
+                        $scope.tree = {
+                            text: steps[y],
+                            leaf: false,
+                            children: []
+                        };
+                    }
+                    current = $scope.tree.children;
+                } else {
+                    existing = null;
+                    for (i = 0; i < current.length; i++) {
+                        if (current[i].text === steps[y]) {
+                            existing = current[i];
+                            break;
                         }
                     }
-                    if (categoryObject[prop] instanceof Object || categoryObject[prop] instanceof Array)
-                        result = $scope.getCategoryObject(categoryObject[prop], categoryId);
+                    if (existing) {
+                        current = existing.children;
+                    } else {
+                        current.push({
+                            text: steps[y],
+                            leaf: false,
+                            children: []
+                        });
+                        current = current[current.length - 1].children;
+                    }
+                }
+            }
+            current.push({
+                text: name,
+                leaf: true
+            })
+        }
+        $scope.generateJSON = function () {
+            //console.log(categoryListObj)
+            for (x = 0; x < categoryListObj.length; x++) {
+                //steps =data[x].team.split('/');
+                $scope.fillTree(categoryListObj[x].categoryName, categoryListObj[x].categoryName)
+            }
+            //console.log(tree);
+        }
+
+        $scope.getObject = function (theObject, parentCategoryId) {
+            var result = null;
+            if (theObject instanceof Array) {
+                for (var i = 0; i < theObject.length; i++) {
+
+                    result = $scope.getObject(theObject[i], parentCategoryId);
+                }
+            } else {
+                console.log('=>' + parentCategoryId)
+                for (var prop in theObject) {
+                    console.log(prop + ': ' + theObject[prop]);
+                    if (prop == '_id') {
+                        if (theObject[prop] == parentCategoryId) {
+                            return theObject;
+                        }
+                    }
+                    if (theObject[prop] instanceof Object || theObject[prop] instanceof Array)
+                        result = $scope.getObject(theObject[prop], parentCategoryId);
                 }
             }
             return result;
         }
 
-        //opens Edit Category section
         $scope.openEditNode = function (data) {
             if ($scope.lastEditOpenedNode != null && $scope.lastEditOpenedNode._id != data._id)
                 $scope.cancelEditNode($scope.lastEditOpenedNode);
+
             $scope.lastEditOpenedNode = data;
             data.editCat = true;
         }
-
-        //cancels Edit Category section
         $scope.cancelEditNode = function (data) {
             data.editCat = false;
         }
 
-        //opens Add Child Category section
         $scope.openAddChildNode = function (data) {
-            //$scope.category.parentCategory = data._id;
+            $scope.category.parentCategory = data._id;
             //alert('adding child node to ' + data.name)
             //  data.nodes.push({ name: '', parentCategory: data.name,  editCat: false, isValid: false, nodes: []});
             //  console.log(data.nodes.length);
             //  console.log(JSON.stringify($scope.itemList, null, 2));
-            var addNode = data.nodes.filter(function (cat) {
-                return !cat.isValid;
-            });
-
-            if(addNode.length == 1) {
-                addNode[0].showAdd = true;
-            }
         }
 
-        //cancels Add Child Category section
         $scope.cancelAddChildNode = function (data) {
-            //console.log($scope.itemList);
-            data.showAdd = false;
-            /*
+            console.log($scope.itemList);
             if (data.parentCategory == 0) {
                 var index = $scope.findIndexByKeyValue($scope.itemList, 'name', data.name);
                 $scope.itemList.splice(index, 1);
             } else {
                 //alert(data.parentCategory);
-                var parent = $scope.getCategoryObject($scope.itemList, data.parentCategory);
+                var parent = $scope.getObject($scope.itemList, data.parentCategory);
                 //alert(data.parentCategory);
                 if (parent != null) {
                     var index = $scope.findIndexByKeyValue(parent.nodes, 'isValid', false);
@@ -242,23 +303,6 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
                     $scope.itemList.splice(index, 1);
                 }
 
-            }*/
-        }
-
-        $scope.saveChildCategory = function () {
-            if ($scope.addCategory.categoryName) {
-                console.log($scope.addCategory.categoryName, $scope.addCategory.parentCategory);
-                $http.post('/categories', {categoryName: $scope.addCategory.categoryName, parentCategory: $scope.addCategory.parentCategory}).
-                success(function (data, status, headers, config) {
-                    $scope.init();
-
-                    //scope.init() not working
-                    window.location.reload(false);
-
-                }).
-                error(function (data, status, headers, config) {
-                    alert("Something gone wrong in saving child category");
-                });
             }
         }
 
@@ -272,12 +316,10 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
             }
         }
 
-        //collapse list view of child categories
+
         $scope.collapse = function (data) {
             data.expandNode = false;
         }
-
-        //expand list view of child categories
         $scope.expand = function (data) {
             data.expandNode = true;
         }
@@ -293,3 +335,10 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
         };
 
 }])
+    .config(function ($routeProvider, $locationProvider) {
+        $routeProvider
+            .when('/category.html#/:categorySlug', {
+                templateUrl: 'category.html',
+                controller: 'CategoryController'
+            });
+    });
