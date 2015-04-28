@@ -98,7 +98,7 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
 
         //recursive method to created a nested Object for category heirarchy
         $scope.processTree = function (parentId, categoryLevel) {
-            console.log('searching for parent ' + parentId);
+            //console.log('searching for parent ' + parentId);
             //for (x=0; x < categoryListObj.length; x++) {
             //    console.log("hey");
             //    $scope.addNode(categoryListObj[x].categoryName, categoryListObj[x].parentCategory);
@@ -125,7 +125,7 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
                         categoryNodeLevel: categoryLevel,
                         nodes: [{isValid: false, showAdd: false, parentCategory: childCategories[c]._id}]
                     });
-                    console.log('adding root ' + childCategories[c].categoryName)
+                    //console.log('adding root ' + childCategories[c].categoryName)
                 } else {
                     var parent = $scope.getCategoryObject($scope.itemList, childCategories[c].parentCategory);
                     if (parent == null) {
@@ -141,7 +141,7 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
                             categoryNodeLevel: categoryLevel,
                             nodes: [{isValid: false, showAdd: false, parentCategory: childCategories[c]._id}]
                         });
-                        console.log('adding parent not found ' + childCategories[c].categoryName)
+                        //console.log('adding parent not found ' + childCategories[c].categoryName)
                     } else {
                         parent.nodes.push({
                             _id: childCategories[c]._id,
@@ -155,7 +155,7 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
                             categoryNodeLevel: categoryLevel,
                             nodes: [{isValid: false, showAdd: false, parentCategory: childCategories[c]._id}]
                         });
-                        console.log('adding parent found' + childCategories[c].categoryName)
+                        //console.log('adding parent found' + childCategories[c].categoryName)
                     }
                 }
 
@@ -174,10 +174,11 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
             var result = null;
             if (categoryObject instanceof Array) {
                 for (var i = 0; i < categoryObject.length; i++) {
+                    //console.log(categoryObject[i]);
                     result = $scope.getCategoryObject(categoryObject[i], categoryId);
                 }
             } else {
-                //console.log('=>' + categoryId)
+                //console.log('=>' + categoryId + " - " + categoryObject)
                 for (var prop in categoryObject) {
                     //console.log(prop + ': ' + categoryObject[prop]);
                     if (prop == '_id') {
@@ -245,13 +246,35 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
             }*/
         }
 
-        $scope.saveChildCategory = function () {
+        $scope.saveChildCategory = function (category) {
             if ($scope.addCategory.categoryName) {
-                console.log($scope.addCategory.categoryName, $scope.addCategory.parentCategory);
+                //console.log($scope.addCategory.categoryName, $scope.addCategory.parentCategory);
                 $http.post('/categories', {categoryName: $scope.addCategory.categoryName, parentCategory: $scope.addCategory.parentCategory}).
                 success(function (data, status, headers, config) {
-                    $scope.init();
+                    //$scope.init();
+                    /*
+                    console.log($scope.itemList);
+                    console.log($scope.addCategory.parentCategory);
+                    var parentCategory = $scope.getCategoryObject($scope.itemList, $scope.addCategory.parentCategory);
 
+                    console.log(parentCategory);
+                    if(parentCategory != null && parentCategory.length == 1) {
+
+                        parentCategory[0].nodes.push({
+                            _id: data._id,
+                            categorySlug: data.categorySlug,
+                            name: data.categoryName,
+                            parentCategory: data.parentCategory,
+                            expandNode: true,
+                            editCat: false,
+                            isValid: true,
+                            showAdd: false,
+                            categoryNodeLevel: parentCategory.categoryLevel + 1,
+                            nodes: [{isValid: false, showAdd: false, parentCategory: data._id}]
+                        });
+                        console.log('adding parent found' + data.categoryName)
+                    }
+                    */
                     //scope.init() not working
                     window.location.reload(false);
 

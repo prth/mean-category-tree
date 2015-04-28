@@ -45,7 +45,7 @@
             </div>
 
             <div class='category-add' ng-show='data.showAdd'>
-                <form class="form-inline" ng-submit="saveChildCategory()" ng-controller="CategoryController" ng-show='data.showAdd'>
+                <form class="form-inline" ng-submit="saveChildCategory(data)" ng-controller="CategoryController" ng-show='data.showAdd'>
                         <div class="form-group">
                             <input type="text" class="form-control" ng-model="addCategory.categoryName">
                             <input type="text" class="form-control" ng-model="addCategory.parentCategory" ng-init="addCategory.parentCategory=data.parentCategory" readonly="readonly" ng-show="data.isValid"> {{data.name}}

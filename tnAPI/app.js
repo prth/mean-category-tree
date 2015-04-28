@@ -139,12 +139,16 @@ app.post('/categories', function (req, res) {
     //  category.categorySlug = result;
     category.save(function (err) {
         if (!err) {
-            return console.log("created");
+            //return
+            console.log("created");
+            return res.send(category);
         } else {
-            return console.log(err);
+            console.log("error");
+            return err;
+            //return console.log(err);
         }
     });
-    return res.send(category);
+
     //});;
 });
 
