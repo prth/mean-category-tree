@@ -6,3 +6,20 @@ body {
 a {
   color: #00B7FF;
 }
+
+
+ ul {
+    padding-top: 10px;
+}
+
+li  {
+    padding: 10px;
+}
+
+#categoryItemList {
+    margin-top: 25px;
+}
+
+.expandedNodeMargin {
+    margin-left: 28px;
+}

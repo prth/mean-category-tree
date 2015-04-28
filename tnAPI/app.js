@@ -14,20 +14,26 @@ var users = require('./routes/users');
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/meanTreeDB2');
 
-
+//Category Schema
 var categorySchema = new mongoose.Schema({
     categoryName: String,
-    categorySlug: { type: String, index: { unique: true }},
+    categorySlug: {
+        type: String,
+        index: {
+            unique: true
+        }
+    },
     categoryCount: String,
     parentCategory: String
 });
 
+//Added monguurl to create URL slug
 categorySchema.plugin(monguurl({
-  source: 'categoryName',
-  target: 'categorySlug'
+    source: 'categoryName',
+    target: 'categorySlug'
 }));
 
-var Category = mongoose.model('Category',categorySchema);
+var Category = mongoose.model('Category', categorySchema);
 
 var app = express();
 
@@ -35,11 +41,12 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(__dirname + '/public/favicon.ico'));
+app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -48,23 +55,25 @@ app.use('/users', users);
 
 var categoryList = [];
 
-app.get('/categories', function(req, res, next){
+app.get('/categories', function (req, res, next) {
     //categoryList = [];
-    //var ls = 
+    //var ls =
     //getAllCategories(0);
-    mongoose.model('Category').find(function(err, categories) {
+    mongoose.model('Category').find(function (err, categories) {
         res.json(categories);
     });
 });
 
-app.get('/categories/:categorySlug', function (req, res){
-  return Category.findOne({'categorySlug': req.params.categorySlug}, function (err, category) {
-    if (!err) {
-      return res.send(category);
-    } else {
-      return console.log(err);
-    }
-  });
+app.get('/categories/:categorySlug', function (req, res) {
+    return Category.findOne({
+        'categorySlug': req.params.categorySlug
+    }, function (err, category) {
+        if (!err) {
+            return res.send(category);
+        } else {
+            return console.log(err);
+        }
+    });
 });
 
 /*
@@ -77,7 +86,7 @@ app.post('/categories', function(req, res){
     c.categorySlug = "hey";
     c.categoryCount = "hey";
     c.parentCategory = "hey";
-    
+
     c.save(function(err) {
         if (err){
             console.log('Error in Saving user: '+err);
@@ -86,14 +95,14 @@ app.post('/categories', function(req, res){
         console.log('User Registration succesful');
         //return done(null, newUser);
     });
-    
+
     var c = new Category();
     c.categoryName = req.param('categoryName', null);
     c.categorySlug = req.param('categorySlug', null);
     c.categoryCount = req.param('categoryCount', null);
     c.parentCategory = req.param('parentCategory', null);
-    
-    
+
+
     c.save(function(err) {
         if (err){
             console.log('Error in Saving user: '+err);
@@ -102,93 +111,95 @@ app.post('/categories', function(req, res){
         console.log('User Registration succesful');
         //return done(null, newUser);
     });*/
-/*    
+/*
     Category.create(req.body, function (err, post) {
         if (err) return next(err);
         res.json(post);
     });
-    
+
 }); */
 
 
-        
-app.post('/categories', function (req, res){
-  var category;
-  console.log("POST: ");
-  console.log(req.body);
-  category = new Category({
-    categoryName: req.body.categoryName,
-    categoryCount: req.body.categoryCount,
-    parentCategory: req.body.parentCategory
-  });
-    if(category.parentCategory == null)
+
+app.post('/categories', function (req, res) {
+    var category;
+    console.log("POST: ");
+    console.log(req.body);
+    category = new Category({
+        categoryName: req.body.categoryName,
+        categoryCount: req.body.categoryCount,
+        parentCategory: req.body.parentCategory
+    });
+    if (category.parentCategory == null)
         category.parentCategory = 0;
     //console.log('find slug');
     //create_url_slug(category.categoryName, function(result){
     //if(category.categorySlug != null)
     //{
     //  category.categorySlug = result;
-      category.save(function (err) {
+    category.save(function (err) {
         if (!err) {
-          return console.log("created");
+            return console.log("created");
         } else {
-          return console.log(err);
+            return console.log(err);
         }
-      });
-      return res.send(category);
+    });
+    return res.send(category);
     //});;
 });
 
 
-app.delete('/categories/:id', function (req, res){
-  return Category.findById(req.params.id, function (err, category) {
-     
-       mongoose.model('Category').find({'parentCategory':category._id}, function (err, categoryResult) {
-        if (!err) {
-         for(var i=0;i<categoryResult.length;i++) {    
-          categoryResult[i].parentCategory = 0;
-          categoryResult[i].save(function (err) {
-              if (!err) {
-                console.log("updated");
-              } else {
+app.delete('/categories/:id', function (req, res) {
+    return Category.findById(req.params.id, function (err, category) {
+
+        mongoose.model('Category').find({
+            'parentCategory': category._id
+        }, function (err, categoryResult) {
+            if (!err) {
+                for (var i = 0; i < categoryResult.length; i++) {
+                    categoryResult[i].parentCategory = 0;
+                    categoryResult[i].save(function (err) {
+                        if (!err) {
+                            console.log("updated");
+                        } else {
+                            console.log(err);
+                        }
+                    });
+                }
+            } else {
+                return console.log(err);
+            }
+        });
+
+
+        return category.remove(function (err) {
+            if (!err) {
+
+                console.log("removed");
+                return res.send('');
+            } else {
                 console.log(err);
-              }
-           });
-         }
-        } else {
-          return console.log(err);
-        }
-      });
-      
-      
-    return category.remove(function (err) {
-      if (!err) {
-          
-        console.log("removed");
-        return res.send('');
-      } else {
-        console.log(err);
-      }
+            }
+        });
     });
-  });
 });
 
 
-app.put('/categories/:id', function (req, res){
-  return Category.findById(req.params.id, function (err, category) {
-    category.categoryName = req.body.categoryName;
-    category.categorySlug = req.body.categorySlug;
-    category.categoryCount = req.body.categoryCount;
-    category.parentCategory = req.body.parentCategory;
-    return category.save(function (err) {
-      if (!err) {
-        console.log("updated");
-      } else {
-        console.log(err);
-      }
-      return res.send(category);
+app.put('/categories/:id', function (req, res) {
+    return Category.findById(req.params.id, function (err, category) {
+        category.categoryName = req.body.categoryName;
+        category.categorySlug = req.body.categorySlug;
+        category.categoryCount = req.body.categoryCount;
+        category.parentCategory = req.body.parentCategory;
+        return category.save(function (err) {
+            if (!err) {
+                console.log("updated");
+            } else {
+                console.log(err);
+            }
+            return res.send(category);
+        });
     });
-  });
 });
 
 // catch 404 and forward to error handler
@@ -203,23 +214,23 @@ app.put('/categories/:id', function (req, res){
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-      message: err.message,
-      error: err
+    app.use(function (err, req, res, next) {
+        res.status(err.status || 500);
+        res.render('error', {
+            message: err.message,
+            error: err
+        });
     });
-  });
 }
 
 // production error handler
 // no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-  res.status(err.status || 500);
-  res.render('error', {
-    message: err.message,
-    error: {}
-  });
+app.use(function (err, req, res, next) {
+    res.status(err.status || 500);
+    res.render('error', {
+        message: err.message,
+        error: {}
+    });
 });
 
 
