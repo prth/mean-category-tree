@@ -378,8 +378,12 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
 
             console.log("Looking for " + idValue );
             console.log("Looking in " + JSON.stringify(obj) );
-            if(obj._id && obj._id == idValue)
+            if(obj._id == idValue)
+                console.log("we found a match");
+            if(obj._id == idValue) {
+                console.log("returning " + JSON.stringify(obj));
                 return obj;
+            }
 
 
 
@@ -390,10 +394,12 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
                     });
 
                     if(obj.nodes.length > 0) {
-                        for(i = 0; i < obj.nodes.length;i++) {
+                        console.log("Tracing childs " + obj.nodes.length);
+                        for(var i = 0; i < obj.nodes.length;i++) {
                             //console.log("SubObject " + JSON.stringify(obj.nodes[i]));
                             if(obj.nodes[i].isValid && obj.nodes[i].isValid == true) {
-                                return $scope.findNodeById(obj.nodes[i], idValue);
+                                console.log("calling on " + JSON.stringify(obj.nodes[i]))   ;
+                                $scope.findNodeById(obj.nodes[i], idValue);
                             }
 
                         }
