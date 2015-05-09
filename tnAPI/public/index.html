@@ -41,7 +41,7 @@
                 </button>
                 <button ng-click="expand(data)" ng-show="(data.nodes.length > 1)&&(!data.expandNode)" class='btn btn-xs'><span class='glyphicon glyphicon-chevron-down'></span>
                 </button>
-                {{data.name}}
+                {{data.name}} {{data._id}}
             </div>
 
             <div class='category-add' ng-show='data.showAdd'>
@@ -88,7 +88,7 @@
 
 
         <ul id="categoryItemList">
-            <li ng-repeat="data in itemList" ng-include="'tree_item_renderer'"></li>
+            <li ng-repeat="data in itemList[0].nodes" ng-include="'tree_item_renderer'"></li>
         </ul>
 
 

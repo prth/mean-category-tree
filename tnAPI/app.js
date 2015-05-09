@@ -12,7 +12,7 @@ var users = require('./routes/users');
 
 //database initialization
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/meanTreeDatabase');
+mongoose.connect('mongodb://localhost/meanTreeDatabase10');
 
 //Category Schema
 var categorySchema = new mongoose.Schema({
@@ -53,14 +53,26 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 app.use('/users', users);
 
-var categoryList = [];
+//var categoryList = [];
+
+var genJSON = require('./modules/generateJSON.js');
+var generateJSON = new genJSON();
 
 app.get('/categories', function (req, res, next) {
-    //categoryList = [];
     //var ls =
     //getAllCategories(0);
     mongoose.model('Category').find(function (err, categories) {
         res.json(categories);
+        /*
+        generateJSON.categoryList = categories;
+        generateJSON.itemList = [];
+        generateJSON.categoryCovered = [];
+        //generateJSON.initiateCategoryList(categories);
+        generateJSON.processTree(0, 0, generateJSON.itemList);
+        var finalTree = [];
+        finalTree.push(generateJSON.categoryList);
+        finalTree.push(generateJSON.itemList);
+        res.json(finalTree);*/
     });
 });
 
@@ -70,7 +82,7 @@ app.get('/categories/:categorySlug', function (req, res) {
     }, function (err, category) {
         if (!err) {
             return res.send(category);
-        } 
+        }
     });
 });
 
@@ -121,7 +133,7 @@ app.post('/categories', function(req, res){
 
 app.post('/categories', function (req, res) {
     var category;
-    
+
     category = new Category({
         categoryName: req.body.categoryName,
         categoryCount: req.body.categoryCount,
@@ -129,12 +141,12 @@ app.post('/categories', function (req, res) {
     });
     if (category.parentCategory == null)
         category.parentCategory = 0;
-    
+
     category.save(function (err) {
         if (!err) {
             console.log("created");
             return res.send(category);
-        } 
+        }
     });
 
     //});;
@@ -158,7 +170,7 @@ app.delete('/categories/:id', function (req, res) {
                         }
                     });
                 }
-            } 
+            }
         });
 
 
@@ -167,7 +179,7 @@ app.delete('/categories/:id', function (req, res) {
 
                 console.log("removed");
                 return res.send('');
-            } 
+            }
         });
     });
 });
@@ -182,8 +194,9 @@ app.put('/categories/:id', function (req, res) {
         return category.save(function (err) {
             if (!err) {
                 console.log("updated");
-				return res.send(category);
-            } 
+                console.log(req.body.parentCategory + " _ _" + category.parentCategory);
+                return res.send(category);
+            }
         });
     });
 });

@@ -11,22 +11,27 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
         $scope.getCategories = function () {
             $http.get('/categories').
             success(function (data, status, headers, config) {
-
+                console.log(data);
                 if (data != null && data.length > 0) {
                     console.log(data.length);
                     $scope.tree = {};
                     $scope.categoryList = {};
-                    $scope.itemList = [];
+
+                    //console.log($scope.itemList[0]);
                     $scope.categoryCovered = [];
 
                     $scope.categoryList = data;
                     categoryListObj = data;
                     //$scope.generateJSON();
-                    $scope.processTree("0", 0);
-                    if ($scope.$$phase !== '$digest') {
+
+                    if($scope.categoryList && $scope.categoryList.length > 0)
+                        $scope.processTree("0", 0);
+
+                    //alert($scope.itemList.nodes);
+                    /*if ($scope.$$phase !== '$digest') {
                         $scope.$digest()
                     }
-                    if (!$scope.$$phase) $scope.$apply();
+                    if (!$scope.$$phase) $scope.$apply();*/
                     //$scope.itemList = [];
                 }
 
@@ -54,16 +59,48 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
             if ($scope.editCategoryModel.categoryName) {
                 $http.put('/categories/' + data._id, $scope.editCategoryModel).
                 success(function (dt, status, headers, config) {
+                    //alert($scope.editCategoryModel.parentCategory);
+                    //alert(dt.parentCategory);
+                    if(data.parentCategory == dt.parentCategory) {
+                        alert("same category");
+                        var targetList;
+                        if(dt.parentCategory == 0) {
+                            //alert("main");
+                            targetList = $scope.itemList[0].nodes;
+                        }
+                        else {
+                            var temp = $scope.findNodeById($scope.itemList[0].nodes, dt.parentCategory)
+                            //var temp = $scope.findIndexByKeyValue($scope.itemList, '_id', $scope.category.parentCategory);
+                            alert(temp);
+                            console.log(JSON.stringify(temp));
+                            targetList = temp.nodes;
+                        }
+
+                        alert(targetList.length);
+                        var categoryFound = targetList.filter(function (cat) {
+                            return cat._id == dt._id;
+                        });
+                        alert(categoryFound[0]);
+                        console.log("Blast" + categoryFound);
+                        console.log(JSON.stringify(categoryFound));
+                        alert(categoryFound[0].name);
+
+                        categoryFound[0].name = dt.categoryName;
+                    }
+                    else
+                        alert("different category");
+
+
 
                     data.editCat = false;
-                    data.categoryName = $scope.editCategoryModel.categoryName;
-                    $scope.init();
+                    //data.categoryName = $scope.editCategoryModel.categoryName;
+                    //$scope.init();
                     //scope.init() not working
-                    window.location.reload(false);
+                    //window.location.reload(false);
 
                 }).
                 error(function (dt, status, headers, config) {
-                    alert("Something gone wrong");
+                    //alert("Something gone wrong");
                 });
             }
         }
@@ -73,10 +110,49 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
             if ($scope.category.categoryName) {
                 $http.post('/categories', $scope.category).
                 success(function (data, status, headers, config) {
-                    $scope.init();
+                    //console.log("dude" + $scope.category);
+                    //$scope.init();
+                    //console.log(data);
+                    //itemList.add(data);
+                    $scope.categoryList.push(data);
 
+                    var targetList;
+                    var categoryLevel = 0;
+                    //alert($scope.category.parentCategory);
+                    if(!$scope.category.parentCategory || $scope.category.parentCategory == 0) {
+
+                        //console.log(JSON.stringify($scope.itemList));
+                        targetList = $scope.itemList[0].nodes;
+                    }
+                    else {
+                        alert($scope.category.parentCategory);
+
+                        var filterList = $scope.itemList[0].nodes.filter(function(cat) {
+                            return cat.isValid == true;
+                        });
+
+                        var temp = $scope.findNodeById($scope.itemList[0], $scope.category.parentCategory)
+                        //var temp = $scope.findIndexByKeyValue($scope.itemList, '_id', $scope.category.parentCategory);
+                        console.log("Found out " + JSON.stringify(temp));
+                        targetList = temp.nodes;
+                        categoryLevel = temp.categoryNodeLevel + 1;
+                    }
+
+                    targetList.push({
+                        _id: data._id,
+                        categorySlug: data.categorySlug,
+                        name: data.categoryName,
+                        parentCategory: data.parentCategory,
+                        editCat: false,
+                        expandNode: true,
+                        isValid: true,
+                        showAdd: false,
+                        categoryNodeLevel: categoryLevel,
+                        nodes: [{isValid: false, showAdd: false, parentCategory: data._id}]
+                    });
+                    console.log($scope.itemList);
                     //scope.init() not working
-                    window.location.reload(false);
+                    //window.location.reload(false);
 
                 }).
                 error(function (data, status, headers, config) {
@@ -89,6 +165,7 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
         $scope.init = function () {
             $scope.categoryList = [];
             $scope.itemList = [];
+            $scope.itemList.push({isParentNode: true, nodes: []});
             $scope.categoryCovered = [];
             $scope.tree = {};
             $scope.lastEditOpenedNode = null;
@@ -100,9 +177,9 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
         //recursive method to created a nested Object for category heirarchy
         $scope.processTree = function (parentId, categoryLevel) {
             //console.log('searching for parent ' + parentId);
-            //for (x=0; x < categoryListObj.length; x++) {
+            //for (x=0; x < categorylistobj.length; x++) {
             //    console.log("hey");
-            //    $scope.addNode(categoryListObj[x].categoryName, categoryListObj[x].parentCategory);
+            //    $scope.addnode(categorylistobj[x].categoryname, categorylistobj[x].parentcategory);
             //}
 
             //filter from main categoryList to get all the child categories
@@ -114,7 +191,8 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
                 childCategories[c].categoryNodeLevel = categoryLevel;
                 //console.log(childCategories[c]);
                 if (parentId == 0) {
-                    $scope.itemList.push({
+                    console.log($scope.itemList);
+                    $scope.itemList[0].nodes.push({
                         _id: childCategories[c]._id,
                         categorySlug: childCategories[c].categorySlug,
                         name: childCategories[c].categoryName,
@@ -130,7 +208,7 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
                 } else {
                     var parent = $scope.getCategoryObject($scope.itemList, childCategories[c].parentCategory);
                     if (parent == null) {
-                        $scope.itemList.push({
+                        $scope.itemList.nodes.push({
                             _id: childCategories[c]._id,
                             categorySlug: childCategories[c].categorySlug,
                             name: childCategories[c].categoryName,
@@ -262,7 +340,7 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
                 $http.post('/categories', {categoryName: $scope.addCategory.categoryName, parentCategory: $scope.addCategory.parentCategory}).
                 success(function (data, status, headers, config) {
                     //$scope.init();
-                    /*
+
                     console.log($scope.itemList);
                     console.log($scope.addCategory.parentCategory);
                     var parentCategory = $scope.getCategoryObject($scope.itemList, $scope.addCategory.parentCategory);
@@ -284,15 +362,69 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
                         });
                         console.log('adding parent found' + data.categoryName)
                     }
-                    */
+
                     //scope.init() not working
-                    window.location.reload(false);
+                    //window.location.reload(false);
 
                 }).
                 error(function (data, status, headers, config) {
                     alert("Something gone wrong in saving child category");
                 });
             }
+        }
+
+        $scope.findNodeById = function(obj, idValue) {
+            var result;
+
+            if(obj._id && obj._id == idValue)
+                return obj;
+            else if(obj.isValid == true){
+
+
+                if(obj.nodes && obj.nodes.length > 0) {
+
+                    var filterList2 = obj.nodes.filter(function(cat) {
+                        return cat.isValid == true;
+                    });
+
+                    if(obj.nodes.length > 0) {
+                        for(i = 0; i < obj.nodes.length;i++) {
+                            if(obj.nodes[i].isValid && obj.nodes[i].isValid == true) {
+                                return $scope.findNodeById(obj.nodes[i], idValue);
+                            }
+
+                        }
+                    }
+                }
+            }
+            //return result;
+            /*
+            for (var i = 0; i < objList.length; i++) {
+                if(objList[i].isValid == true) {
+                    //alert("HERO" + obj[i][key]);
+                    //alert("HERO "  +objList[i]._id);
+                    if (objList[i]._id == idValue) {
+                        alert("Value match" + objList[i]);
+                        return objList[i];
+                    }
+                    else {
+
+                        if(objList[i].nodes && objList[i].nodes.length > 1) {
+                            //alert('inner loop');
+                            var filterList = objList[i].nodes.filter(function(cat) {
+                                return cat.isValid == true;
+                            });
+                            console.log("Filtered List");
+                            console.log(filterList);
+                            if(filterList.length > 0) {
+                                return result = $scope.findNodeById(filterList, idValue);
+                            }
+                        }
+                    }
+                }
+            }
+            return result;*/
+            alert('thats it');
         }
 
         $scope.findIndexByKeyValue = function (obj, key, value) {
