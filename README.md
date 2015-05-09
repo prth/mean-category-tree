@@ -25,7 +25,14 @@ Note: Code cleanup is pending
 
 <br /><br />
 Screenshots:
-<br />
+
+<br /><br />
+NEW:
+![Screenshot New](https://github.com/prth/mean-category-tree/blob/master/screenshots/screenshotNew1.jpg "Screenshot New")
+
+
+<br /><br />
+Others screenshots (without the button to add a child category)
 ![Screenshot 1](https://github.com/prth/mean-category-tree/blob/master/screenshots/screenshot1.jpg "Screenshot 1")
 <br />
 ![Screenshot 2](https://github.com/prth/mean-category-tree/blob/master/screenshots/screenshot2.jpg "Screenshot 2")

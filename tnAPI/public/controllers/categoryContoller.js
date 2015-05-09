@@ -173,7 +173,7 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
             $scope.getCategories();
         };
 
-
+		//can be moved to server - can be handled by node.js
         //recursive method to created a nested Object for category heirarchy
         $scope.processTree = function (parentId, categoryLevel) {
             //console.log('searching for parent ' + parentId);

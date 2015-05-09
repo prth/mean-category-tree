@@ -188,7 +188,7 @@ app.delete('/categories/:id', function (req, res) {
 app.put('/categories/:id', function (req, res) {
     return Category.findById(req.params.id, function (err, category) {
         category.categoryName = req.body.categoryName;
-        category.categorySlug = req.body.categorySlug;
+        //category.categorySlug = req.body.categorySlug;
         category.categoryCount = req.body.categoryCount;
         category.parentCategory = req.body.parentCategory;
         return category.save(function (err) {
