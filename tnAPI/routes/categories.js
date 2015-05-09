@@ -3,15 +3,13 @@ var router = express.Router();
 
 var async = require('async');
 
-//database initialization
-var mongoose = require('../db/connect').mongooseConnect();
 
 //Category Schema
 var Category = require('../db/models/categoryModel').categoryModel();
 
 
 router.get('/', function (req, res, next) {
-    mongoose.model('Category').find(function (err, categories) {
+    Category.find(function (err, categories) {
         res.json(categories);
     });
 });
@@ -51,7 +49,7 @@ router.post('/', function (req, res) {
 router.delete('/:id', function (req, res) {
     return Category.findById(req.params.id, function (err, category) {
 
-        mongoose.model('Category').find({
+        Category.find({
             'parentCategory': category._id
         }, function (err, categoryResults) {
             if (!err) {

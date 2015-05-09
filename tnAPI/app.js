@@ -8,6 +8,9 @@ var bodyParser = require('body-parser');
 var routes = require('./routes/index');
 var categories = require('./routes/categories');
 
+//database initialization
+var mongoose = require('./db/connect').mongooseConnect();
+
 
 var app = express();
 
