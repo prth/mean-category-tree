@@ -173,7 +173,7 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
             $scope.getCategories();
         };
 
-		//can be moved to server - can be handled by node.js
+        //can be moved to server - can be handled by node.js
         //recursive method to created a nested Object for category heirarchy
         $scope.processTree = function (parentId, categoryLevel) {
             //console.log('searching for parent ' + parentId);
@@ -376,9 +376,11 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
         $scope.findNodeById = function(obj, idValue) {
             var result;
 
+            console.log("Looking for " + idValue );
+            console.log("Looking in " + JSON.stringify(obj) );
             if(obj._id && obj._id == idValue)
                 return obj;
-            else if(obj.isValid == true){
+
 
 
                 if(obj.nodes && obj.nodes.length > 0) {
@@ -389,6 +391,7 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
 
                     if(obj.nodes.length > 0) {
                         for(i = 0; i < obj.nodes.length;i++) {
+                            //console.log("SubObject " + JSON.stringify(obj.nodes[i]));
                             if(obj.nodes[i].isValid && obj.nodes[i].isValid == true) {
                                 return $scope.findNodeById(obj.nodes[i], idValue);
                             }
@@ -396,7 +399,7 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
                         }
                     }
                 }
-            }
+
             //return result;
             /*
             for (var i = 0; i < objList.length; i++) {
