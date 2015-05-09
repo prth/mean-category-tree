@@ -6,13 +6,14 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var async = require('async');
 var monguurl = require('monguurl');
+var async = require('async');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
 
 //database initialization
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/meanTreeDatabase10');
+mongoose.connect('mongodb://localhost/meanTreeDatabase11');
 
 //Category Schema
 var categorySchema = new mongoose.Schema({
@@ -158,29 +159,32 @@ app.delete('/categories/:id', function (req, res) {
 
         mongoose.model('Category').find({
             'parentCategory': category._id
-        }, function (err, categoryResult) {
+        }, function (err, categoryResults) {
             if (!err) {
-                for (var i = 0; i < categoryResult.length; i++) {
-                    categoryResult[i].parentCategory = 0;
-                    categoryResult[i].save(function (err) {
+
+                async.each(categoryResults, function(eachChildCategory, callback) {
+                    eachChildCategory.remove(function (err) {
                         if (!err) {
                             console.log("updated");
+                            callback();
                         } else {
                             console.log(err);
                         }
                     });
-                }
+                }, function(err) {
+                    return category.remove(function (err) {
+                        if (!err) {
+
+                            console.log("removed");
+                            return res.send('');
+                        }
+                    });
+                });
             }
         });
 
 
-        return category.remove(function (err) {
-            if (!err) {
 
-                console.log("removed");
-                return res.send('');
-            }
-        });
     });
 });
 
