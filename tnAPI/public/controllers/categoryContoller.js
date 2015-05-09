@@ -394,12 +394,12 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
 
                     console.log($scope.itemList);
                     console.log($scope.addCategory.parentCategory);
-                    var parentCategory = $scope.getCategoryObject($scope.itemList, $scope.addCategory.parentCategory);
+                    var parentCategory = $scope.findNodeById($scope.itemList[0], $scope.addCategory.parentCategory);
 
-                    console.log(parentCategory);
-                    if(parentCategory != null && parentCategory.length == 1) {
+                    console.log("YOLO " + JSON.stringify(parentCategory));
+                    if(parentCategory != null) {
 
-                        parentCategory[0].nodes.push({
+                        parentCategory.nodes.push({
                             _id: data._id,
                             categorySlug: data.categorySlug,
                             name: data.categoryName,
