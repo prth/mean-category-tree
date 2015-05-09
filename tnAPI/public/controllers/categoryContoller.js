@@ -411,7 +411,11 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
                             categoryNodeLevel: parentCategory.categoryLevel + 1,
                             nodes: [{isValid: false, showAdd: false, parentCategory: data._id}]
                         });
+
+
                         console.log('adding parent found' + data.categoryName)
+                        $scope.lastAddOpenedNode.showAdd = false;
+                        $scope.lastAddOpenedNode = null;
                     }
 
                     //scope.init() not working
