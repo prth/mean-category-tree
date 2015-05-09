@@ -140,7 +140,8 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
                         return cat._id == dt._id;
                     });
 
-                    categoryListUnit[0].name = newCategory.categoryName;
+                    console.log("EDIT CategoryList Unit " + JSON.stringify(categoryListUnit));
+                    categoryListUnit[0].categoryName = newCategory.name;
                     categoryListUnit[0].categoryNodeLevel = newCategory.categoryNodeLevel;
 
                     data.editCat = false;
@@ -520,7 +521,7 @@ categoryApp.controller('CategoryController', ['$scope', '$http', '$route', '$rou
         $scope.categoryNodeLevelFilter = function (categoryNode1) {
             return function(categoryNode2) {
                 return categoryNode1.isValid == true && categoryNode1.categoryNodeLevel >= categoryNode2.categoryNodeLevel
-                  && categoryNode1.parentCategory != categoryNode2._id;
+                  && categoryNode1.parentCategory != categoryNode2._id && categoryNode1._id != categoryNode2._id;
             }
         };
 
